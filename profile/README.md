@@ -70,6 +70,14 @@ DID를 통해 유기견의 존재를 기록하고 입양과 후원을 연결하�
 
 ---
 
+## 홈 화면
+
+<img width="4056" height="3240" alt="메인" src="https://github.com/user-attachments/assets/e554aec7-5b26-4fbe-a5c8-7ca578b7d01f" />
+
+
+
+---
+
 ## 시연 영상
 
 ### 1️회원가입 및 로그인
