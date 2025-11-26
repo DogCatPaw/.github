@@ -2,11 +2,10 @@
 
 <div align="center">
 
-<!-- 로고 이미지를 여기에 추가하세요 -->
-<!-- ![멍멍Paw 로고](./assets/logo.png) -->
+<img width="202" height="80" alt="로고" src="https://github.com/user-attachments/assets/4e2ec72e-dc59-416b-ab2f-994d5885d224" />
 
-**한 마리의 유기동물도, 반려동물도 잊히지 않도록**  
-DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결하는 웹 플랫폼
+**한 마리의 유기견도 잊히지 않도록**  
+DID를 통해 유기견의 존재를 기록하고 입양과 후원을 연결하는 웹 플랫폼
 
 </div>
 
@@ -29,7 +28,7 @@ DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결�
 
 ### 배경
 
-반려동물 산업이 성장하는 이면에는 여전히 **매년 10만 마리 이상의 유기동물**이 발생하고, 그중 약 **2만여 마리(18.5%)가 안락사** 되는 현실이 있습니다.
+반려동물 산업이 성장하는 이면에는 여전히 **매년 10만 마리 이상의 유기견**이 발생하고, 그중 약 **2만여 마리(18.5%)가 안락사** 되는 현실이 있습니다.
 
 ### 문제점
 
@@ -42,8 +41,8 @@ DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결�
 멍멍Paw는 **DID(Decentralized Identifier) 기술**과 **블록체인**을 활용하여:
 
 1. **유기견 비문을 통한 고유 신원 부여**
-2. **실시간 채팅과 스토리로 입양 접근성 향상**
-3. **자체 화폐(뼈다귀)를 통한 투명한 후원 시스템**
+2. **실시간 채팅과 입양 후기로 입양 접근성 향상**
+3. **자체 화폐(뼈다귀)를 통한 충전식 후원 시스템**
 
 ---
 
@@ -62,10 +61,10 @@ DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결�
 ### 3. 후원 시스템
 - 자체 화폐 '뼈다귀' (1뼈다귀 = 1,000원)
 - 토스 페이먼츠 연동 간편 결제
-- 투명한 후원 내역 공개
+- 후원자 내역 익명 공개
 
 ### 4. 입양 후기 & 스토리
-- 입양 완료 후 경험 공유
+- 입양 완료 후 입양 후기 경험 공유
 - 일상 콘텐츠를 통한 유대감 형성
 - 커뮤니티 기반 소통
 
@@ -122,7 +121,7 @@ DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결�
 ## 시스템 아키텍처
 
 <!-- 아키텍처 이미지를 여기에 추가하세요 -->
-![시스템 아키텍처](./KakaoTalk_20251119_032359177.png)
+<img width="7484" height="4796" alt="최종 아키텍처" src="https://github.com/user-attachments/assets/3b4ad453-ebcc-4b10-acb3-cafa43e4de0e" />
 
 ### 아키텍처 특징
 
@@ -207,7 +206,76 @@ DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결�
 ### 4. 펫 이전 (입양) 플로우
 **입양 프로세스:**
 
-#### 1단계: 입양 공고 및 상담
+```mermaid
+sequenceDiagram
+    actor Adopter as 입양자
+    actor Adoptee as 피입양자
+    participant Frontend
+    participant Gateway as API Gateway
+    participant Spring as Domain Service
+    participant Chat as Chat Service
+    participant ML as ML Service
+    participant VC as VC Service
+    participant Blockchain
+    
+    Note over Adopter,Spring: 1단계: 입양 공고 및 상담
+    Adoptee->>Frontend: 입양 공고 작성
+    Frontend->>Spring: 공고 저장
+    
+    Adopter->>Frontend: 입양 공고 조회
+    Adopter->>Frontend: "입양 상담하기" 클릭
+    Frontend->>Spring: 채팅방 생성 요청
+    Spring-->>Chat: 1:1 채팅방 생성
+    
+    Adopter<<->>Adoptee: 실시간 채팅 상담
+    
+    Note over Adopter,Blockchain: 2단계: 입양자 서명
+    Adopter->>Frontend: "입양 신청하기" 클릭
+    Frontend->>Gateway: 입양 신청 요청
+    Gateway->>Adopter: 서명 요청 (MetaMask)
+    Adopter->>Gateway: 서명 완료
+    Gateway->>Spring: 입양 신청 상태 저장
+    Spring-->>Adoptee: 알림 전송
+    
+    Note over Adopter,Blockchain: 3단계: 비문 검증
+    Adoptee->>Frontend: 입양 절차 시작
+    Frontend->>Adoptee: 비문 사진 촬영 요청
+    Adoptee->>Frontend: 비문 사진 업로드
+    
+    Frontend->>Gateway: 비문 검증 요청
+    Gateway->>ML: 특징벡터 추출
+    ML-->>Gateway: 특징벡터 반환
+    
+    Gateway->>Spring: 기존 비문과 유사도 비교
+    Spring->>Spring: 유사도 계산
+    
+    alt 유사도 >= 85%
+        Spring-->>Gateway: 검증 성공
+        
+        Note over Adopter,Blockchain: 4단계: 소유권 이전
+        Gateway->>Adoptee: 서명 요청 (MetaMask)
+        Adoptee->>Gateway: 서명 완료
+        
+        Gateway->>VC: VC 업데이트 요청
+        VC->>Blockchain: Guardian 변경 트랜잭션<br/>(Adoptee → Adopter)
+        Blockchain-->>VC: 트랜잭션 완료
+        
+        VC-->>Gateway: VC 이전 완료
+        Gateway->>Spring: 입양 완료 상태 저장
+        Spring-->>Frontend: 입양 완료
+        
+        Frontend->>Chat: 입양 완료 알림 전송
+        Frontend-->>Adopter: 입양 완료 메시지
+        Frontend-->>Adoptee: 입양 완료 메시지
+        
+    else 유사도 < 85%
+        Spring-->>Gateway: 검증 실패
+        Gateway-->>Frontend: 비문 불일치
+        Frontend-->>Adoptee: 재촬영 요청
+    end
+```
+
+<!--#### 1단계: 입양 공고 및 상담
 - 피입양자(분양자)가 입양 공고 작성
 - 입양자가 "입양 상담하기" 클릭
 - 1:1 실시간 채팅방 생성
@@ -238,9 +306,16 @@ DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결�
 **다음 로그인부터:**
 - 입양자가 해당 펫의 VC를 포함한 VP 발급 가능
 - 입양자가 펫의 새로운 보호자로 인증됨
-
+-->
 ---
-### 주요 테이블 설명
+
+## 데이터베이스 설계
+
+### ERD (Entity Relationship Diagram)
+<img width="3960" height="2576" alt="멍멍paw_erd" src="https://github.com/user-attachments/assets/84483569-224d-484d-afba-210428aab474" />
+
+
+<!--### 주요 테이블 설명
 
 #### 1. USERS (사용자)
 - **역할**: 회원 정보 관리
@@ -324,6 +399,7 @@ DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결�
 - [스마트 컨트랙트](./docs/CONTRACTS.md)
 - [배포 가이드](./docs/DEPLOYMENT.md)
 - [개발 환경 설정](./docs/SETUP.md)
+-->
 
 ---
 
@@ -333,23 +409,23 @@ DID를 통해 유기동물의 존재를 기록하고 입양과 후원을 연결�
 
 | 이름 | 역할 | 소속 | 이메일 | GitHub |
 |------|------|------|--------|--------|
-| 모진영 | 팀장, 풀스택 개발 | 상명대학교 | ahwlsqja1324@gmail.com | [@username](링크) |
-| 신윤진 | 백엔드 개발 | 상명대학교 | yj001shin@naver.com | [@username](링크) |
-| 박수현 | 프론트엔드 개발 | 상명대학교 | tngus092112@gmail.com | [@username](링크) |
+| 모진영 | 팀장, 풀스택 개발 | 상명대학교 | ahwlsqja1324@gmail.com | [@ahwlsdud](링크) |
+| 신윤진 | 백엔드 개발 | 상명대학교 | yj001shin@naver.com | [@nomad1jin](링크) |
+| 박수현 | 프론트엔드 개발 | 상명대학교 | tngus092112@gmail.com | [@onion](링크) |
 
 ---
 
-## 수상 내역
+## 공모전 
 
 - **제9회 K-PaaS 활용 공모전** - 서비스 개발 부문 출품 (2025.10.31)
 
 ---
 
-## 라이선스
+<!--## 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
----
+-->
 
 ## 문의
 
